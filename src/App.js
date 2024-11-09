@@ -1,6 +1,19 @@
 import { useState, useEffect } from "react";
 import word_lists from './words.json';
 
+// Function to generate a random word
+function getRandomWord(word_lists) {
+  const words = word_lists.year_1;
+  const randomIndex = Math.floor(Math.random() * words.length); // Get a random number from within the words list
+  const selectedWord = words[randomIndex];
+  console.log("Word is:", selectedWord);
+  const randomPlacement = Math.floor(Math.random() * selectedWord.length); // Get a random number within the word length
+  console.log("Position to blank is:", randomPlacement);
+  const wordAndLetter = replaceChar(selectedWord, randomPlacement);
+  return wordAndLetter; // Return the word at the position of the random number
+}
+
+// Function to replace a random letter in the selected word with a _ character
 function replaceChar(str, index) {
   const blankedWord =  str.substring(0, index) + "_" + str.substring(index + 1);
   const missingLetter = str.charAt(index);
@@ -9,21 +22,35 @@ function replaceChar(str, index) {
   return generatedWord;
 }
 
-function getRandomWord(word_lists) {
-  const words = word_lists.year_2;
-  const randomIndex = Math.floor(Math.random() * words.length); // Get a random number from within the words list
-  const selectedWord = words[randomIndex];
-  console.log("Word is:", selectedWord);
-  const randomPlacement = Math.floor(Math.random() * selectedWord.length); // Get a random number within the word length
-  console.log("Position to blank is:", randomPlacement);
-  const wordArray = replaceChar(selectedWord, randomPlacement);
-  const word = wordArray[0];
-  const letter = wordArray[1];
-  console.log("Finale word is:", word);
-  console.log("Missing letter is:", letter);
-  return word; // Return the word at the position of the random number
-}
+// Function to generate a list of random letters, plus the correct letter
+function generateAnswers(letter) {
+  const getLetter = letter;
+  const alphabet = [
+    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
+    "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"
+  ];
 
+  let answerLetter1, answerLetter2;
+
+  do {
+    // Generate two random letters
+    answerLetter1 = alphabet[Math.floor(Math.random() * 26)];
+    answerLetter2 = alphabet[Math.floor(Math.random() * 26)];
+  } while (
+    answerLetter1 === getLetter ||  // Ensure answerLetter1 is not the same as getLetter
+    answerLetter2 === getLetter ||  // Ensure answerLetter2 is not the same as getLetter
+    answerLetter1 === answerLetter2 // Ensure answerLetter1 and answerLetter2 are different
+  );
+
+  let answerArray = [answerLetter1, answerLetter2];
+
+  const randomIndex = Math.floor(Math.random() * (answerArray.length + 1));
+  // Insert the item at the random index
+  answerArray.splice(randomIndex, 0, getLetter);
+
+  
+  return answerArray;
+}
 
 function App() {
   const [word, setWord] = useState("");
@@ -33,6 +60,13 @@ function App() {
     setWord(getRandomWord(word_lists));
   }, []);
 
+  const generatedWord = word[0];
+  const letter = word[1];
+
+  const answers = generateAnswers(letter);
+
+  console.log(answers);
+
   return (  
     <div className='game-area max-w-xl'>
       <header>
@@ -41,13 +75,13 @@ function App() {
       </header>
 
       <div className='display-area'>
-        {word}
+        {generatedWord}
       </div>
 
       <div className='letter-area'>
-        <li>A</li>
-        <li>B</li>
-        <li>C</li>
+        {answers.map((answer, index) => (
+          <li key={index}>{answer}</li>
+        ))}
       </div>
     </div>
   );
