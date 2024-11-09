@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import word_lists from './words.json';
+import ScoreBoard from './components/scoreboard/score';
 
 // Function to generate a random word
 function getRandomWord(word_lists) {
@@ -53,7 +54,9 @@ function generateAnswers(letter) {
 }
 
 function App() {
+
   const [word, setWord] = useState("");
+  const [score, setScore] = useState(0);
 
   // Get the random word when the component loads
   useEffect(() => {
@@ -67,23 +70,46 @@ function App() {
 
   console.log(answers);
 
+  // Function to check the answer and update the score
+  function checkGuess(answer) {
+    console.log("Answer:", answer, " Letter:", letter)
+    if (answer === letter) {
+      // Update the score and get a new word
+      setScore(prevScore => prevScore + 1);
+      setWord(getRandomWord(word_lists));
+      console.log("You are correct!")
+    } else {
+      console.log("You are wrong!");
+    }
+  }
+
   return (  
-    <div className='game-area max-w-xl'>
-      <header>
-        <h1 className='title'>Common Exception Word Game</h1>
-        <p>Can you guess the missing letter?</p>
-      </header>
+    <>
+      <div className='game-area max-w-xl'>
+        <header>
+          <h1 className='title'>Common Exception Word Game</h1>
+          <p>Can you guess the missing letter?</p>
+        </header>
 
-      <div className='display-area'>
-        {generatedWord}
-      </div>
+        <div className='display-area'>
+          {generatedWord}
+        </div>
 
-      <div className='letter-area'>
-        {answers.map((answer, index) => (
-          <li key={index}>{answer}</li>
-        ))}
+        <div className='letter-area'>
+          {answers.map((answer, index) => (
+            <li
+              key={index}
+              value={answer}
+              onClick={() => (checkGuess(answer))}
+            >{answer}</li>
+          ))}
+        </div>
+        <ScoreBoard
+          player={"Maisie"}
+          score={score} />
       </div>
-    </div>
+    </>
+
   );
 }
 
