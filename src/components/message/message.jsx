@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import './message.css';
 
-const Message = ({ result }) => {
+const Message = ({ result, originalWord }) => {
     const [showMessage, setShowMessage] = useState(false);
     console.log("Pram from result is:", result)
     console.log("showMessage pram is:", showMessage)
@@ -13,7 +13,7 @@ const Message = ({ result }) => {
 
             const timer = setTimeout(() => {
                 setShowMessage(false);
-            }, 3000);
+            }, 2000);
             
             return () => clearTimeout(timer);
         }
@@ -27,9 +27,19 @@ const Message = ({ result }) => {
         <>
             <div className='message-box'>
                 {result === "correct" ? (
-                    <p>Correct! Great job!</p>
+                    <>
+                        <p>Correct!</p>
+                        <p>The word was:</p>
+                        <p className="correct-word"><u>{originalWord}</u></p>
+                        <p>Great Job!</p>
+                    </>
                 ) : (
-                    <p>Oops! Try again!</p>
+                    <>
+                        <p>Oops!</p>
+                        <p>The word was:</p>
+                        <p className="correct-word"><u>{originalWord}</u></p>
+                        <p>Try again!</p>
+                    </>
                 )}
             </div>
         </>
