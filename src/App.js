@@ -3,6 +3,7 @@ import word_lists from './words.json';
 import ScoreBoard from './components/scoreboard/score';
 import Message from "./components/message/message";
 import WinScreen from "./components/win-screen/win-screen";
+import StartScreen from "./components/start-screen/start-screen";
 
 // Function to generate a random word
 function getRandomWord(word_lists) {
@@ -38,6 +39,8 @@ function App() {
   const [score, setScore] = useState(0);
   const [result, setResult] = useState(null);
   const [lastWord, setLastWord] = useState("");
+  const [newGame, setNewGame] = useState(false);
+  const [playerName, setPlayerName] = useState("");
 
   const loadNewWord = () => {
     const newWord = getRandomWord(word_lists);
@@ -76,12 +79,16 @@ function App() {
     }
   }, [result]);
 
+  if (newGame === false) {
+    return <StartScreen setNewGame={setNewGame} setPlayerName={setPlayerName}/>
+  }
+
   // Shown winning screen if score gets to 10
   if (score >= 10) {
     return (
       <>
         <Message result={result} originalWord={lastWord} />     
-        <WinScreen resetGame={resetGame} />
+        <WinScreen resetGame={resetGame} setNewGame={setNewGame}/>
       </>
     )
   }
@@ -109,7 +116,7 @@ function App() {
           ))}
         </div>
         <ScoreBoard
-          player={"Maisie"}
+          player={playerName}
           score={score} />
       </div>
       </div>
