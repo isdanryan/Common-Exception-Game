@@ -78,10 +78,16 @@ function App() {
 
   // Shown winning screen if score gets to 10
   if (score >= 10) {
-    return <WinScreen resetGame={resetGame}/>
+    return (
+      <>
+        <Message result={result} originalWord={lastWord} />     
+        <WinScreen resetGame={resetGame} />
+      </>
+    )
   }
   return (  
     <>
+      <div className="container">
       <Message result={result} originalWord={lastWord} />
       <div className='game-area max-w-xl'>
         <header>
@@ -105,6 +111,7 @@ function App() {
         <ScoreBoard
           player={"Maisie"}
           score={score} />
+      </div>
       </div>
     </>
   );

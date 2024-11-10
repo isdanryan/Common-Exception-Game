@@ -8,10 +8,16 @@ body {
   background-attachment: fixed;
 }
 
+.container {
+  display: flex;
+  margin: auto;
+  width: fit-content;
+}
+
 .game-area {
   display: flex;
   flex-flow: row wrap;
-  margin: 2rem auto;
+  margin: 2rem 1rem;
   border-radius: 10px;
   border: solid 5px rgb(240, 82, 82);
   background: white;

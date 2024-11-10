@@ -1,0 +1,15 @@
+.accept-btn {
+    background-color: rgb(82, 204, 71);
+    border-radius: 5px;
+    padding: 0.5rem;
+    margin: 0.5rem;
+    color: white;
+}
+
+.cancel-btn {
+    background-color: rgb(177, 49, 49);
+    border-radius: 5px;
+    padding: 0.5rem;
+    margin: 0.5rem;
+    color: white;
+}
