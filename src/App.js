@@ -1,15 +1,14 @@
 import { useState, useEffect } from "react";
 import word_lists from './words.json';
 import ScoreBoard from './components/scoreboard/score';
+import Message from "./components/message/message";
 
 // Function to generate a random word
 function getRandomWord(word_lists) {
   const words = word_lists.year_1;
   const randomIndex = Math.floor(Math.random() * words.length); // Get a random number from within the words list
   const selectedWord = words[randomIndex];
-  console.log("Word is:", selectedWord);
   const randomPlacement = Math.floor(Math.random() * selectedWord.length); // Get a random number within the word length
-  console.log("Position to blank is:", randomPlacement);
   const wordAndLetter = replaceChar(selectedWord, randomPlacement);
   return wordAndLetter; // Return the word at the position of the random number
 }
@@ -18,7 +17,6 @@ function getRandomWord(word_lists) {
 function replaceChar(str, index) {
   const blankedWord =  str.substring(0, index) + "_" + str.substring(index + 1);
   const missingLetter = str.charAt(index);
-  console.log("Letter missing is:", missingLetter);
   const generatedWord = [blankedWord, missingLetter];
   return generatedWord;
 }
@@ -57,6 +55,7 @@ function App() {
 
   const [word, setWord] = useState("");
   const [score, setScore] = useState(0);
+  const [result, setResult] = useState("");
 
   // Get the random word when the component loads
   useEffect(() => {
@@ -68,23 +67,30 @@ function App() {
 
   const answers = generateAnswers(letter);
 
-  console.log(answers);
-
   // Function to check the answer and update the score
   function checkGuess(answer) {
-    console.log("Answer:", answer, " Letter:", letter)
     if (answer === letter) {
       // Update the score and get a new word
+      setResult("correct");
       setScore(prevScore => prevScore + 1);
       setWord(getRandomWord(word_lists));
-      console.log("You are correct!")
     } else {
-      console.log("You are wrong!");
+      setResult("incorrect");
+      setWord(getRandomWord(word_lists));
     }
   }
 
+    // Reset `result` after it has been displayed by Message
+    useEffect(() => {
+      if (result !== null) {
+        const resetResult = setTimeout(() => setResult(null), 3000);
+        return () => clearTimeout(resetResult);
+      }
+    }, [result]);
+
   return (  
     <>
+      <Message result={result} />
       <div className='game-area max-w-xl'>
         <header>
           <h1 className='title'>Common Exception Word Game</h1>
