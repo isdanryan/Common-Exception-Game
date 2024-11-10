@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import word_lists from './words.json';
 import ScoreBoard from './components/scoreboard/score';
 import Message from "./components/message/message";
+import WinScreen from "./components/win-screen/win-screen";
 
 // Function to generate a random word
 function getRandomWord(word_lists) {
@@ -43,7 +44,13 @@ function App() {
     setWord(newWord);
     setAnswers(generateAnswers(newWord.missingLetter));
   }
-  
+
+  const resetGame = () => {
+    setScore(0);
+    setResult(null);
+    loadNewWord();
+  }
+
   // Initial load of word when the component mounts
   useEffect(() => {
     loadNewWord();
@@ -69,6 +76,10 @@ function App() {
     }
   }, [result]);
 
+  // Shown winning screen if score gets to 10
+  if (score >= 10) {
+    return <WinScreen resetGame={resetGame}/>
+  }
   return (  
     <>
       <Message result={result} originalWord={lastWord} />
