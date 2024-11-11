@@ -71,6 +71,7 @@ function App() {
     setLastWord(word.originalWord);
   }
 
+
   // Reset `result` after it has been displayed by Message
   useEffect(() => {
     if (result !== null) {
@@ -81,6 +82,7 @@ function App() {
     loadNewWord();
     setDisabled(false);
   }, [result]);
+ 
 
   if (newGame === false) {
     return <StartScreen setNewGame={setNewGame} setPlayerName={setPlayerName} setScore={setScore}/>
@@ -114,7 +116,7 @@ function App() {
             <li
               key={index}
               value={answer}
-              onClick={() => checkGuess(answer)}
+              onClick={disabled ? null : () => checkGuess(answer)}
             >{answer}</li>
           ))}
         </div>

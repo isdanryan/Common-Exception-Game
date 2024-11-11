@@ -35,7 +35,7 @@ const StartScreen = ({ setNewGame, setPlayerName, setScore }) => {
                         <h2>{capitaliseName(inputName)}</h2>
                     </div>
                     <button
-                        className="accept-btn"
+                        className={`accept-btn ${inputName === "" ? "hidden" : ""}`}
                         onClick={() => startGame()}
                         >Yes</button>
                 </div>
