@@ -6,12 +6,13 @@ function capitaliseName(str) {
     return str.charAt(0).toUpperCase() + str.slice(1) + "?";
 }
 
-const StartScreen = ({ setNewGame, setPlayerName }) => {
+const StartScreen = ({ setNewGame, setPlayerName, setScore }) => {
 
     const [inputName, setInputName] = useState("");
 
     const startGame = () => {
         setNewGame(true);
+        setScore(0);
         setPlayerName(capitaliseName(inputName).slice(0, -1));
     }
 

@@ -41,6 +41,7 @@ function App() {
   const [lastWord, setLastWord] = useState("");
   const [newGame, setNewGame] = useState(false);
   const [playerName, setPlayerName] = useState("");
+  const [disabled, setDisabled] = useState(false);
 
   const loadNewWord = () => {
     const newWord = getRandomWord(word_lists);
@@ -68,19 +69,21 @@ function App() {
       setResult("incorrect");
     }
     setLastWord(word.originalWord);
-    loadNewWord();
   }
 
   // Reset `result` after it has been displayed by Message
   useEffect(() => {
     if (result !== null) {
+      setDisabled(true);
       const resetResult = setTimeout(() => setResult(null), 2000);
       return () => clearTimeout(resetResult);
     }
+    loadNewWord();
+    setDisabled(false);
   }, [result]);
 
   if (newGame === false) {
-    return <StartScreen setNewGame={setNewGame} setPlayerName={setPlayerName}/>
+    return <StartScreen setNewGame={setNewGame} setPlayerName={setPlayerName} setScore={setScore}/>
   }
 
   // Shown winning screen if score gets to 10
@@ -94,7 +97,7 @@ function App() {
   }
   return (  
     <>
-      <div className="container">
+      <div className={`container ${disabled ? "disabled" : ""}`}>
       <Message result={result} originalWord={lastWord} />
       <div className='game-area max-w-xl'>
         <header>
@@ -103,7 +106,7 @@ function App() {
         </header>
 
         <div className='display-area'>
-          {word.blankedWord}
+          {`${result ? word.originalWord : word.blankedWord}`}
         </div>
 
         <div className='letter-area'>

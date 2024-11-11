@@ -66,3 +66,7 @@ header {
   list-style: none;
   text-align: center;
 }
+
+.disabled {
+  pointer-events: none;
+}
