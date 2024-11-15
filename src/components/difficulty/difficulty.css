@@ -1,0 +1,21 @@
+.difficulty-select {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    margin: 2rem;
+}
+
+.difficulty-select > * {
+    width: 80px;
+    height: 80px;
+    text-align: center;
+    padding: 1rem;
+    font-size: 2rem;
+    background-color: aqua;
+    border: solid 2px black;
+    border-radius: 5px;
+}
+
+.is-selected {
+    background-color: rgb(167, 167, 167);
+}

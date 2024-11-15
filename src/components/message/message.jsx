@@ -1,10 +1,8 @@
 import { useState, useEffect } from "react";
 import './message.css';
 
-const Message = ({ result, originalWord }) => {
+const Message = ({ result, originalWord, score, setIsGameOver }) => {
     const [showMessage, setShowMessage] = useState(false);
-    console.log("Pram from result is:", result)
-    console.log("showMessage pram is:", showMessage)
 
     // Set a timer to hide the message after 3 seconds
     useEffect(() => {
@@ -13,12 +11,15 @@ const Message = ({ result, originalWord }) => {
 
             const timer = setTimeout(() => {
                 setShowMessage(false);
+                if (score >= 10) {
+                    setIsGameOver(true);
+                }
             }, 2000);
             
             return () => clearTimeout(timer);
         }
 
-    }, [result]);
+    }, [result, score, setIsGameOver]);
 
     // Only render the message if showMessage is true
     if (!showMessage) return null;

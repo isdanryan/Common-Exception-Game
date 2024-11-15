@@ -1,7 +1,7 @@
 import React from "react";
 import './win-screen.css';
 
-const WinScreen = ({ resetGame, setNewGame }) => {
+const WinScreen = ({ resetGame, newGame }) => {
 
     return (
         <>
@@ -16,7 +16,7 @@ const WinScreen = ({ resetGame, setNewGame }) => {
                     onClick={resetGame}>Play again</button>
                 <button
                     className="cancel-btn"
-                    onClick={() => setNewGame(false)}
+                    onClick={newGame}
                 >Menu</button>
                 </div>
             </div>

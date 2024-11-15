@@ -1,19 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import word_lists from './words.json';
 import ScoreBoard from './components/scoreboard/score';
 import Message from "./components/message/message";
 import WinScreen from "./components/win-screen/win-screen";
 import StartScreen from "./components/start-screen/start-screen";
+import Difficulty from "./components/difficulty/difficulty";
 
-// Function to generate a random word
-function getRandomWord(word_lists) {
-  const words = word_lists.year_1;
-  const randomIndex = Math.floor(Math.random() * words.length);
-  const selectedWord = words[randomIndex];
-  const randomPlacement = Math.floor(Math.random() * selectedWord.length);
-  const blankedWord = replaceChar(selectedWord, randomPlacement);
-  return { blankedWord, originalWord: selectedWord, missingLetter: selectedWord[randomPlacement] };
-}
+
 
 // Function to replace a random letter in the selected word with a _ character
 function replaceChar(str, index) {
@@ -33,44 +26,73 @@ function generateAnswers(letter) {
 }
 
 function App() {
-
-  const [word, setWord] = useState({ blankedWord: "", originalWord: "", missingLetter: "" });
+  const [word, setWord] = useState("");
   const [answers, setAnswers] = useState([]);
   const [score, setScore] = useState(0);
   const [result, setResult] = useState(null);
   const [lastWord, setLastWord] = useState("");
-  const [newGame, setNewGame] = useState(false);
+  const [newGameFlag, setNewGameFlag] = useState(true);
   const [playerName, setPlayerName] = useState("");
   const [disabled, setDisabled] = useState(false);
+  const [difficulty, setDifficulty] = useState(null);
+  const [isGameover, setIsGameover] = useState(false);
 
-  const loadNewWord = () => {
-    const newWord = getRandomWord(word_lists);
+  // Function to generate a random word
+  function getRandomWord(word_lists, difficulty) {
+    if (!difficulty) {
+      console.error("No difficulty set yet.");
+      return { blankedWord: "", originalWord: "", missingLetter: "" };
+    }
+    const difficultyKey = difficulty.toString();
+    const words = word_lists[difficultyKey];
+    const randomIndex = Math.floor(Math.random() * words.length);
+    const selectedWord = words[randomIndex];
+    const randomPlacement = Math.floor(Math.random() * selectedWord.length);
+    const blankedWord = replaceChar(selectedWord, randomPlacement);
+    return { blankedWord, originalWord: selectedWord, missingLetter: selectedWord[randomPlacement] };
+  }
+
+  const loadNewWord = useCallback(() => {
+    if (isGameover) return;
+    const newWord = getRandomWord(word_lists, difficulty);
     setWord(newWord);
     setAnswers(generateAnswers(newWord.missingLetter));
-  }
+  }, [difficulty, isGameover]);
 
   const resetGame = () => {
     setScore(0);
     setResult(null);
-    loadNewWord();
-  }
+    setDifficulty(null);
+    setIsGameover(false);
+    setLastWord("");
+    setAnswers([]);
+    setDisabled(false);
+    setWord("");
+  };
 
-  // Initial load of word when the component mounts
-  useEffect(() => {
-    loadNewWord();
-  }, []);
+  const newGame = () => {
+    setScore(0);
+    setResult(null);
+    setDifficulty(null);
+    setNewGameFlag(true);
+    setIsGameover(false);
+  };
 
-  // Function to check the answer and update the score
   function checkGuess(answer) {
-    if (answer === word.missingLetter) {
-      setScore(prevScore => prevScore + 1);
-      setResult("correct");
+    // Prevent further guesses if the game is over
+    if (isGameover) {
+      console.log("Game is over. Guess ignored.");
+      return;
     } else {
-      setResult("incorrect");
+      if (answer === word.missingLetter) {
+        setScore((prevScore) => prevScore + 1);
+        setResult("correct");
+      } else {
+        setResult("incorrect");
+      }
+      setLastWord(word.originalWord);
     }
-    setLastWord(word.originalWord);
   }
-
 
   // Reset `result` after it has been displayed by Message
   useEffect(() => {
@@ -79,54 +101,64 @@ function App() {
       const resetResult = setTimeout(() => setResult(null), 2000);
       return () => clearTimeout(resetResult);
     }
-    loadNewWord();
     setDisabled(false);
-  }, [result]);
- 
+    loadNewWord();
+  }, [result, loadNewWord]);
 
-  if (newGame === false) {
-    return <StartScreen setNewGame={setNewGame} setPlayerName={setPlayerName} setScore={setScore}/>
+  if (newGameFlag) {
+    return (
+      <StartScreen
+        setNewGameFlag={setNewGameFlag}
+        setPlayerName={setPlayerName}
+        setScore={setScore}
+      />
+    );
   }
 
-  // Shown winning screen if score gets to 10
-  if (score >= 10) {
+  if (!newGameFlag && difficulty === null) {
+    return <Difficulty playerName={playerName} setDifficulty={setDifficulty} />;
+  }
+
+  if (difficulty !== null) {
+    if (isGameover) {
+      return (
+        <>
+          <WinScreen resetGame={resetGame} newGame={newGame} />
+        </>
+      );
+    }
     return (
       <>
-        <Message result={result} originalWord={lastWord} />     
-        <WinScreen resetGame={resetGame} setNewGame={setNewGame}/>
+        <div className={`container ${disabled ? "disabled" : ""}`}>
+          <Message result={result} originalWord={lastWord} score={score} setIsGameOver={setIsGameover} />
+          <div className="game-area max-w-xl">
+            <header>
+              <h1 className="title">Common Exception Word Game</h1>
+              <p>Can you guess the missing letter?</p>
+            </header>
+
+            <div className="display-area">
+              {`${result ? word.originalWord : word.blankedWord}`}
+            </div>
+
+            <div className="letter-area">
+              {answers.map((answer, index) => (
+                <li
+                  key={index}
+                  value={answer}
+                  onClick={disabled ? null : () => checkGuess(answer)}
+                >
+                  {answer}
+                </li>
+              ))}
+            </div>
+            <ScoreBoard player={playerName} score={score} />
+          </div>
+        </div>
       </>
-    )
+    );
   }
-  return (  
-    <>
-      <div className={`container ${disabled ? "disabled" : ""}`}>
-      <Message result={result} originalWord={lastWord} />
-      <div className='game-area max-w-xl'>
-        <header>
-          <h1 className='title'>Common Exception Word Game</h1>
-          <p>Can you guess the missing letter?</p>
-        </header>
-
-        <div className='display-area'>
-          {`${result ? word.originalWord : word.blankedWord}`}
-        </div>
-
-        <div className='letter-area'>
-          {answers.map((answer, index) => (
-            <li
-              key={index}
-              value={answer}
-              onClick={disabled ? null : () => checkGuess(answer)}
-            >{answer}</li>
-          ))}
-        </div>
-        <ScoreBoard
-          player={playerName}
-          score={score} />
-      </div>
-      </div>
-    </>
-  );
 }
 
 export default App;
+
